@@ -52,6 +52,8 @@ def monitor_apps(brand_profile, app_listings):
             publisher_mismatch=publisher_mismatch,
             description_similarity=description_similarity
         )
+        if risk["risk_score"] < 30:
+            continue
 
         findings.append({
             "name": app_name,

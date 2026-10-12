@@ -1,35 +1,76 @@
+
 {
-    "brands": [
-        {
-            "brand_name": "NovaKart",
-            "website": "https://novakart.example",
-            "logo_url": "",
-            "social_accounts": {
-                "instagram": "@novakart_official",
-                "facebook": "https://facebook.com/novakart.demo",
-                "linkedin": "https://linkedin.com/company/novakart-demo",
-                "other": ""
-            },
-            "official_app": {
-                "name": "NovaKart Shopping",
-                "developer": "NovaKart Technologies"
-            }
-        },
-        {
-            "brand_name": "ShopSwift",
-            "website": "https://shopswift.example",
-            "logo_url": "",
-            "social_accounts": {
-                "instagram": "@shopswift_official",
-                "facebook": "https://facebook.com/shopswift.demo",
-                "linkedin": "https://linkedin.com/company/shopswift-demo",
-                "other": ""
-            },
-            "official_app": {
-                "name": "ShopSwift Shopping",
-                "developer": "ShopSwift Technologies",
-                "description": "Shop products online, compare prices, explore new arrivals, track orders, and manage your shopping account securely."
-            }
-        }
-    ]
+  "brands": [
+    {
+      "brand_name": "NovaKart",
+      "website": "https://novakart.example",
+      "logo_url": "",
+      "social_accounts": {
+        "instagram": "@novakart_official",
+        "facebook": "https://facebook.com/novakart.demo",
+        "linkedin": "https://linkedin.com/company/novakart-demo",
+        "other": ""
+      },
+      "official_app": {
+        "name": "NovaKart Shopping",
+        "developer": "NovaKart Technologies",
+        "description": ""
+      }
+    },
+    {
+      "brand_name": "ShopSwift",
+      "website": "https://shopswift.example",
+      "logo_url": "",
+      "social_accounts": {
+        "instagram": "@shopswift_official",
+        "facebook": "https://facebook.com/shopswift.demo",
+        "linkedin": "https://linkedin.com/company/shopswift-demo",
+        "other": ""
+      },
+      "official_app": {
+        "name": "ShopSwift Shopping",
+        "developer": "ShopSwift Technologies",
+        "description": "Shop products online, compare prices, explore new arrivals, track orders, and manage your shopping account securely."
+      }
+    }
+  ],
+  "brand_profile": {
+    "brand_name": "ThreatLens",
+    "website": "https://threatlens.example",
+    "logo_url": "",
+    "social_accounts": {
+      "instagram": "",
+      "facebook": "",
+      "linkedin": "",
+      "other": ""
+    },
+    "official_app": {
+      "name": "ThreatLens AI",
+      "developer": "ThreatLens Labs",
+      "description": "The official ThreatLens security app."
+    }
+  },
+  "app_listings": [
+    {
+      "name": "ThreatLens AI",
+      "developer": "ThreatLens Labs",
+      "description": "The official ThreatLens security app.",
+      "store": "Sample data",
+      "url": ""
+    },
+    {
+      "name": "ThreatLens Security",
+      "developer": "Unknown Developer",
+      "description": "Protect your ThreatLens account.",
+      "store": "Sample data",
+      "url": ""
+    },
+    {
+      "name": "Weather Today",
+      "developer": "Example Apps",
+      "description": "A local weather forecast app.",
+      "store": "Sample data",
+      "url": ""
+    }
+  ]
 }
