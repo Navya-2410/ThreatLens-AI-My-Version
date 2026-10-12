@@ -14,6 +14,22 @@
                 "name": "NovaKart Shopping",
                 "developer": "NovaKart Technologies"
             }
+        },
+        {
+            "brand_name": "ShopSwift",
+            "website": "https://shopswift.example",
+            "logo_url": "",
+            "social_accounts": {
+                "instagram": "@shopswift_official",
+                "facebook": "https://facebook.com/shopswift.demo",
+                "linkedin": "https://linkedin.com/company/shopswift-demo",
+                "other": ""
+            },
+            "official_app": {
+                "name": "ShopSwift Shopping",
+                "developer": "ShopSwift Technologies",
+                "description": "Shop products online, compare prices, explore new arrivals, track orders, and manage your shopping account securely."
+            }
         }
     ]
 }
