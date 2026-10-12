@@ -1,28 +1,45 @@
 
 import streamlit as st
+import json
+import os
+
+DATA_FILE = os.path.join(
+    os.path.dirname(__file__),
+    "data",
+    "sample_data.json"
+)
+
+
+def load_brands():
+    if not os.path.exists(DATA_FILE):
+        return []
+
+    try:
+        with open(DATA_FILE, "r") as file:
+            data = json.load(file)
+        return data.get("brands", [])
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def save_brands(brands):
+    with open(DATA_FILE, "w") as file:
+        json.dump({"brands": brands}, file, indent=4)
 
 
 def show_brand_profile():
     st.header("Brand Profile")
+    st.write("Register and manage official brand assets.")
 
-    if "brand_profile" not in st.session_state:
-        st.session_state["brand_profile"] = None
+    brands = load_brands()
 
-    saved = st.session_state["brand_profile"]
+    if brands:
+        st.subheader("Registered Brands")
+        for brand in brands:
+            st.write("### " + brand["brand_name"])
+            st.json(brand)
 
-    if saved is not None:
-        st.success("Brand profile registered successfully!")
-
-        st.subheader("Registered Brand Details")
-        st.json(saved)
-
-        if st.button("Register Another Brand"):
-            st.session_state["brand_profile"] = None
-            st.rerun()
-
-        return
-
-    st.write("Register a brand and its official assets.")
+    st.subheader("Register a New Brand")
 
     with st.form("brand_profile_form"):
         brand_name = st.text_input("Brand / Company Name")
@@ -45,7 +62,7 @@ def show_brand_profile():
             if not brand_name.strip():
                 st.error("Please enter a brand name.")
             else:
-                st.session_state["brand_profile"] = {
+                new_brand = {
                     "brand_name": brand_name.strip(),
                     "website": website.strip(),
                     "logo_url": logo_url.strip(),
@@ -61,5 +78,10 @@ def show_brand_profile():
                     }
                 }
 
-                st.success("Brand profile registered!")
-                st.json(st.session_state["brand_profile"])
+                brands.append(new_brand)
+                save_brands(brands)
+
+                st.success(
+                    "Brand profile saved permanently!"
+                )
+                st.json(new_brand)

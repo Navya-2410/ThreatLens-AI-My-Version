@@ -23,3 +23,13 @@ def generate_report(results, filename="threat_report.json"):
         json.dump(report, file, indent=4, ensure_ascii=False)
 
     return report
+
+if __name__ == "__main__":
+    sample_results = [
+        {"name": "NovaKart Shopping", "risk_level": "High"},
+        {"name": "Safe Example App", "risk_level": "Low"}
+    ]
+
+    result = generate_report(sample_results)
+    print(result)
+    print("Report saved successfully!")

@@ -1,0 +1,19 @@
+{
+    "brands": [
+        {
+            "brand_name": "NovaKart",
+            "website": "https://novakart.example",
+            "logo_url": "",
+            "social_accounts": {
+                "instagram": "@novakart_official",
+                "facebook": "https://facebook.com/novakart.demo",
+                "linkedin": "https://linkedin.com/company/novakart-demo",
+                "other": ""
+            },
+            "official_app": {
+                "name": "NovaKart Shopping",
+                "developer": "NovaKart Technologies"
+            }
+        }
+    ]
+}
