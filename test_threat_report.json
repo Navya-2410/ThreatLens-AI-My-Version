@@ -1,0 +1,16 @@
+{
+    "project": "ThreatLens AI",
+    "generated_at": "2026-10-12T17:12:11",
+    "total_items_scanned": 1,
+    "flagged_items": 1,
+    "results": [
+        {
+            "name": "Test Lookalike",
+            "risk_score": 85,
+            "risk_level": "High",
+            "reasons": [
+                "High name similarity"
+            ]
+        }
+    ]
+}

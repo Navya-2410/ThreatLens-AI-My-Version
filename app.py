@@ -6,7 +6,10 @@ from report import generate_report
 from app_monitor import monitor_apps
 from brand_profile import show_brand_profile, load_brands
 from social_monitor import monitor_social_profiles
-
+if "profiles_reviewed" not in st.session_state:
+    st.session_state.profiles_reviewed = 0
+if "apps_reviewed" not in st.session_state:
+    st.session_state.apps_reviewed = 0
 st.set_page_config(
     page_title="ThreatLens AI",
     page_icon="🛡️",
@@ -40,6 +43,7 @@ page = st.sidebar.radio(
 )
 
 
+
 if page == "Dashboard":
     st.header("Security Dashboard")
 
@@ -48,14 +52,32 @@ if page == "Dashboard":
     col1, col2, col3 = st.columns(3)
 
     col1.metric("Brands Registered", len(brands))
-    col2.metric("Profiles Reviewed", 0)
-    col3.metric("Apps Reviewed", 0)
+    col2.metric("Profiles Reviewed", st.session_state.profiles_reviewed)
+    col3.metric("Apps Reviewed", st.session_state.apps_reviewed)
 
     st.write("### Welcome to ThreatLens AI")
     st.write(
         "Register a brand and review possible "
         "look-alike profiles and apps."
     )
+
+    st.info(
+        "Monitoring results will appear here after "
+        "you scan sample social profiles and app listings."
+    )
+
+    st.write("### Project Modules")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Social Media Monitoring")
+        st.write("Detect potential fake or look-alike accounts.")
+
+    with col2:
+        st.subheader("App Store Monitoring")
+        st.write("Identify apps with similar names or publishers.")
+
 
 
 elif page == "Brand Profile":
@@ -95,10 +117,14 @@ elif page == "Social Media Monitoring":
             }
         ]
 
+       
         if st.button("Scan Sample Profiles"):
+            st.session_state.profiles_reviewed += len(sample_profiles)
+
             findings = monitor_social_profiles(
                 brand_profile, sample_profiles
             )
+
 
             st.subheader("Monitoring Results")
             st.write("Sample profiles reviewed:", len(sample_profiles))
@@ -130,9 +156,9 @@ elif page == "Social Media Monitoring":
 
 
 
+
 elif page == "App Store Monitoring":
     st.header("App Store Monitoring")
-    st.caption("Demonstration data only; no live app store is being scanned.")
 
     brands = load_brands()
 
@@ -140,7 +166,6 @@ elif page == "App Store Monitoring":
         st.info("Register a brand profile first.")
     else:
         brand_profile = brands[0]
-
         official_app = brand_profile.get("official_app", {})
 
         app_listings = [
@@ -160,30 +185,25 @@ elif page == "App Store Monitoring":
             }
         ]
 
-        findings = monitor_apps(brand_profile, app_listings)
+        if st.button("Scan Sample Apps"):
+            st.session_state.apps_reviewed += len(app_listings)
 
-        if findings:
-            st.write("### Potentially suspicious apps")
+            findings = monitor_apps(brand_profile, app_listings)
 
-            for app in findings:
-                st.warning(
-                    f"**{app.get('name', 'Unknown app')}** — "
-                    f"risk score: {app.get('risk_score', 0)}/100"
-                )
+            if findings:
+                st.write("### Potentially suspicious apps")
 
-                st.write(
-                    "Risk level: "
-                    + app.get("risk_level", "Unknown")
-                )
+                for app in findings:
+                    st.warning(
+                        f"**{app.get('name', 'Unknown app')}** — "
+                        f"risk score: {app.get('risk_score', 0)}/100"
+                    )
+                    st.write("Risk level: " + app.get("risk_level", "Unknown"))
+                    st.write("Reasons: " + ", ".join(app.get("reasons", [])))
+            else:
+                st.success("No suspicious apps found in the current sample listings.")
 
-                st.write(
-                    "Reasons: "
-                    + ", ".join(app.get("reasons", []))
-                )
-        else:
-            st.success(
-                "No suspicious apps found in the current sample listings."
-            )
+
 
 
 elif page == "Risk Reports":
