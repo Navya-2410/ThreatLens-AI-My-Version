@@ -55,7 +55,7 @@ def show_brand_profile():
         st.subheader("Official Mobile App")
         app_name = st.text_input("Official App Name")
         developer = st.text_input("Official App Developer / Publisher")
-
+        app_description = st.text_area("Official App Description")
         submitted = st.form_submit_button("Register Brand")
 
         if submitted:
@@ -74,7 +74,8 @@ def show_brand_profile():
                     },
                     "official_app": {
                         "name": app_name.strip(),
-                        "developer": developer.strip()
+                        "developer": developer.strip(),
+                        "description": app_description.strip()
                     }
                 }
 

@@ -141,11 +141,20 @@ elif page == "App Store Monitoring":
     else:
         brand_profile = brands[0]
 
+        official_app = brand_profile.get("official_app", {})
+
         app_listings = [
             {
-                "name": "ThreatLens Security",
+                "name": official_app.get("name", ""),
                 "developer": "Unknown Developer",
-                "description": "Protect your account.",
+                "description": "Shop products online, compare prices, explore new arrivals, and track orders.",
+                "store": "Sample data",
+                "url": ""
+            },
+            {
+                "name": brand_profile["brand_name"] + " Customer Support",
+                "developer": "Unknown Developer",
+                "description": "Get help with your account and shopping orders.",
                 "store": "Sample data",
                 "url": ""
             }
