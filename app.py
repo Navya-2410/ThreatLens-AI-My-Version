@@ -58,8 +58,12 @@ if page == "Dashboard":
     col3.metric("Apps Reviewed", st.session_state.apps_reviewed)
 
     st.write("### Welcome to ThreatLens AI")
-    st.write("Register a brand and review possible look-alike profiles and apps.")
-    st.info("Monitoring results appear here after you scan sample profiles and apps.")
+    st.write(
+        "Register a brand and review possible look-alike profiles and apps."
+    )
+    st.info(
+        "Monitoring results appear here after you scan sample profiles and apps."
+    )
 
     col1, col2 = st.columns(2)
     with col1:
@@ -120,7 +124,10 @@ elif page == "Social Media Monitoring":
                     st.write("**Name:**", item.get("name", "Unknown"))
                     st.write("**Username:**", item.get("username", ""))
                     st.write("**Platform:**", item.get("platform", ""))
-                    st.write("**Risk score:**", f'{item.get("risk_score", 0)}/100')
+                    st.write(
+                        "**Risk score:**",
+                        f'{item.get("risk_score", 0)}/100'
+                    )
                     st.write("**Risk level:**", item.get("risk_level", "Unknown"))
                     st.write("**Reasons:**", ", ".join(item.get("reasons", [])))
             else:
@@ -145,11 +152,8 @@ elif page == "App Store Monitoring":
         app_listings = [
             {
                 "name": official_app.get("name") or brand["brand_name"],
-                "developer": "Unknown Developer",
-                "description": (
-                    "Shop products online, compare prices, explore "
-                    "new arrivals, and track orders."
-                ),
+                "developer": official_app.get("developer", ""),
+                "description": official_app.get("description", ""),
                 "store": "Sample data",
                 "url": ""
             },
@@ -236,4 +240,6 @@ elif page == "Risk Reports":
 
         if st.button("Clear Saved Scan Findings"):
             st.session_state.scan_results = []
-            st.success("Saved scan findings cleared. Open Risk Reports again to refresh.")
+            st.success(
+                "Saved scan findings cleared. Open Risk Reports again to refresh."
+            )
