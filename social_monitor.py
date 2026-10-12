@@ -3,6 +3,17 @@ import re
 from rapidfuzz import fuzz
 
 
+SUSPICIOUS_TERMS = (
+    "support",
+    "help",
+    "security",
+    "verify",
+    "claim",
+    "bonus",
+    "customer",
+)
+
+
 def normalize_name(value):
     """Normalize names and usernames for comparison."""
     value = str(value or "").lower().strip()
@@ -10,76 +21,109 @@ def normalize_name(value):
     return re.sub(r"[^a-z0-9]", "", value)
 
 
+def _extract_username(value):
+    """Extract a username from a handle or profile URL."""
+    value = str(value or "").strip()
+
+    if not value:
+        return ""
+
+    if value.startswith("@"):
+        return value[1:]
+
+    if "://" in value:
+        value = value.rstrip("/").split("/")[-1]
+
+    return value.lstrip("@").strip()
+
+
+def _contains_suspicious_term(*values):
+    """Check for suspicious terms as separate username/name tokens."""
+    for value in values:
+        words = re.findall(r"[a-z0-9]+", str(value or "").lower())
+        if any(word in SUSPICIOUS_TERMS for word in words):
+            return True
+    return False
+
+
 def monitor_social_profiles(brand_profile, profiles):
-    """Find possible social profile impersonation using sample data."""
+    """Score supplied candidate profiles for possible impersonation."""
 
     findings = []
 
-    brand_name = brand_profile.get("brand_name", "")
-    social_accounts = brand_profile.get("social_accounts", {})
+    brand_name = str(brand_profile.get("brand_name", "") or "")
+    social_accounts = brand_profile.get("social_accounts", {}) or {}
 
-    official_accounts = []
+    normalized_brand = normalize_name(brand_name)
+    brand_tokens = {
+        normalize_name(token)
+        for token in re.findall(r"[a-z0-9]+", brand_name.lower())
+        if normalize_name(token)
+    }
+    official_usernames = set()
+    official_urls = set()
 
-    for platform, value in social_accounts.items():
-        if not value or not str(value).strip():
+    for value in social_accounts.values():
+        if not value:
             continue
 
         value = str(value).strip()
 
         if value.startswith("@"):
-            username = value
+            official_usernames.add(normalize_name(value))
+        elif "://" in value:
+            official_urls.add(value.lower().rstrip("/"))
         else:
-            username = value.rstrip("/").split("/")[-1]
-
-        official_accounts.append({
-            "username": username,
-            "name": brand_name,
-            "url": value,
-            "platform": platform
-        })
-
-    normalized_brand = normalize_name(brand_name)
+                        official_usernames.add(normalize_name(value))
 
     for profile in profiles:
-        name = profile.get("name", "")
-        username = profile.get("username", "")
-        account_url = profile.get("url", "")
+        name = str(profile.get("name", "") or "")
+        username = str(profile.get("username", "") or "")
+        account_url = str(profile.get("url", "") or "")
         platform = profile.get("platform", "Unknown")
 
-        normalized_username = normalize_name(username)
         normalized_name = normalize_name(name)
+        normalized_username = normalize_name(username)
+        normalized_url = account_url.lower().rstrip("/")
 
-        # Exclude exact registered usernames or official URLs.
-        is_official = False
-
-        for official in official_accounts:
-            official_username = normalize_name(
-                official.get("username", "")
-            )
-            official_url = official.get("url", "").lower().rstrip("/")
-            candidate_url = account_url.lower().rstrip("/")
-
-            if (
-                normalized_username
-                and official_username
-                and normalized_username == official_username
-            ):
-                is_official = True
-
-            if candidate_url and official_url == candidate_url:
-                is_official = True
-
-        if is_official:
+        # Exclude known official handles and exact official URLs.
+        if (
+            normalized_username
+            and normalized_username in official_usernames
+        ) or (
+            normalized_url
+            and normalized_url in official_urls
+        ):
             continue
 
+        # Compare the complete name and username after normalization.
         name_similarity = (
             fuzz.ratio(normalized_brand, normalized_name)
-            if normalized_brand and normalized_name else 0
+            if normalized_brand and normalized_name
+            else 0
         )
-
         username_similarity = (
             fuzz.ratio(normalized_brand, normalized_username)
-            if normalized_brand and normalized_username else 0
+            if normalized_brand and normalized_username
+            else 0
+        )
+
+        # Token-based matching helps when extra words are added.
+        name_token_similarity = (
+            fuzz.token_set_ratio(brand_name, name)
+            if brand_name and name
+            else 0
+        )
+        username_token_similarity = (
+            fuzz.token_set_ratio(brand_name, username)
+            if brand_name and username
+            else 0
+        )
+
+        # Use the strongest relevant similarity signal.
+        name_similarity = max(name_similarity, name_token_similarity)
+        username_similarity = max(
+            username_similarity, username_token_similarity
         )
 
         score = 0
@@ -102,19 +146,17 @@ def monitor_social_profiles(brand_profile, profiles):
             score += 20
             reasons.append("Username resembles the brand name")
 
-        extra_terms = (
-            "support", "help", "security", "verify",
-            "claim", "bonus", "customer"
+        # Extra words increase risk only when the account also resembles
+        # the brand. This reduces false positives from unrelated accounts.
+        has_suspicious_term = _contains_suspicious_term(name, username)
+        resembles_brand = (
+            name_similarity >= 50 or username_similarity >= 50
         )
 
-        combined_text = (
-            str(username).lower() + " " + str(name).lower()
-        )
-
-        if any(term in combined_text for term in extra_terms):
+        if has_suspicious_term and resembles_brand:
             score += 10
             reasons.append(
-                "Contains a support or verification-related term"
+                "Brand-like account contains a support or verification term"
             )
 
         score = min(score, 100)
@@ -146,7 +188,7 @@ def monitor_social_profiles(brand_profile, profiles):
 
 
 def detect_social_profiles(official_accounts, candidates):
-    """Compatibility wrapper for the teammate's function interface."""
+    """Compatibility wrapper for the existing function interface."""
 
     brand_profile = {
         "brand_name": "",
@@ -156,13 +198,10 @@ def detect_social_profiles(official_accounts, candidates):
     for official in official_accounts:
         platform = official.get("platform", "other")
         brand_profile["social_accounts"][platform] = (
-            official.get("url")
-            or official.get("username", "")
+            official.get("url") or official.get("username", "")
         )
 
         if not brand_profile["brand_name"]:
             brand_profile["brand_name"] = official.get("name", "")
 
-    results = monitor_social_profiles(brand_profile, candidates)
-
-    return results
+    return monitor_social_profiles(brand_profile, candidates)
