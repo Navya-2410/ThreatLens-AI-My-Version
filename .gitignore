@@ -1,3 +1,5 @@
 __pycache__/
 *.py[cod]
 threat_report.json
+.venv/
+__pycache__/
