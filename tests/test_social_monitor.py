@@ -26,6 +26,27 @@ class SocialMonitorTests(unittest.TestCase):
 
         self.assertEqual(findings, [])
 
+    def test_shopswift_official_account_is_excluded(self):
+        brand = {
+            "brand_name": "ShopSwift",
+            "social_accounts": {
+                "instagram": "@shopswift_official",
+                "facebook": "https://facebook.com/shopswift.demo",
+                "linkedin": "https://linkedin.com/company/shopswift-demo"
+            }
+        }
+
+        profiles = [{
+            "name": "ShopSwift",
+            "username": "@shopswift_official",
+            "platform": "Instagram",
+            "url": ""
+        }]
+
+        findings = monitor_social_profiles(brand, profiles)
+
+        self.assertEqual(findings, [])
+
     def test_lookalike_username_is_detected(self):
         profiles = [{
             "name": "NovaBank Support",

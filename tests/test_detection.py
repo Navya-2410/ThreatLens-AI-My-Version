@@ -1,3 +1,4 @@
+
 import json
 import unittest
 from pathlib import Path
@@ -22,6 +23,16 @@ class AppMonitorTests(unittest.TestCase):
 
     def test_official_app_is_not_flagged(self):
         self.assertNotIn("ThreatLens AI", self.finding_names)
+
+    def test_shopswift_official_app_is_not_flagged(self):
+        brand = next(
+            item for item in sample_data["brands"]
+            if item["brand_name"] == "ShopSwift"
+        )
+        findings = monitor_apps(brand, self.app_listings)
+        finding_names = {item["name"] for item in findings}
+
+        self.assertNotIn("ShopSwift Shopping", finding_names)
 
     def test_unrelated_app_is_not_flagged(self):
         self.assertNotIn("Weather Today", self.finding_names)
